@@ -3,7 +3,7 @@ import { ModeToggle } from './mode-toggle'
 
 export default function MainHeader() {
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40">
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background">
       <div className="flex h-14 items-center justify-between">
         <MainNav />
         <ModeToggle />

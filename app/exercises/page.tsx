@@ -37,7 +37,7 @@ const components: { title: string; href: string; description: string }[] = [
 
 export default function ExercisesPage() {
   return (
-    <div className="grid grid-cols-3 gap-4">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {components.map((component) => (
         <a href={component.href} key={component.href}>
           <Card className="hover:bg-accent">

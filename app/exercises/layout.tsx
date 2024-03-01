@@ -5,5 +5,5 @@ export default function ExercisesLayout({
 }: {
   children: React.ReactNode
 }) {
-  return <ScrollArea className="h-full py-6 pr-6">{children}</ScrollArea>
+  return <ScrollArea className="h-full py-6">{children}</ScrollArea>
 }
