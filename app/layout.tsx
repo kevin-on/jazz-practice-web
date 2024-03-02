@@ -25,7 +25,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="relative flex min-h-screen flex-col bg-background px-2 sm:container sm:mx-auto">
+          <div className="relative flex min-h-screen flex-col bg-background px-4 sm:container sm:mx-auto">
             <MainHeader />
             <main className="flex-1">{children}</main>
           </div>

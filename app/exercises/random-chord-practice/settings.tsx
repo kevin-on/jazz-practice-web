@@ -44,7 +44,11 @@ export default function SettingsDrawer({
           <div className="text-lg">Settings</div>
         </Button>
       </DrawerTrigger>
-      <DrawerContent>
+      <DrawerContent
+        onCloseAutoFocus={(e) => {
+          e.preventDefault()
+        }}
+      >
         <ScrollArea className="max-h-[70vh] overflow-auto">
           <div className="mx-auto w-full max-w-xl">
             <DrawerHeader>
