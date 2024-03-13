@@ -1,13 +1,10 @@
 'use client'
 
-import { useState } from 'react'
 import {
   Drawer,
   DrawerClose,
   DrawerContent,
   DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui/drawer'
 import { Button } from '@/components/ui/button'
@@ -246,8 +243,6 @@ export default function SettingsDrawer({
   selectedScaleType: ScaleType
   setSelectedScaleType: (scaleType: ScaleType) => void
 }) {
-  const [testValue, setTestValue] = useState('A')
-
   return (
     <Drawer onOpenChange={onOpenChange}>
       <DrawerTrigger asChild>
@@ -289,7 +284,7 @@ export default function SettingsDrawer({
                   selectedChordTypes={selectedChordTypes}
                   setSelectedChordTypes={setSelectedChordTypes}
                 />
-                <Separator orientation="horizontal" className="my-4" />
+                <Separator orientation="horizontal" className="mt-4" />
                 <DrawerFooter>
                   <DrawerClose>
                     <Button variant="outline">Close</Button>
@@ -309,6 +304,7 @@ export default function SettingsDrawer({
                   scaleType={selectedScaleType}
                   setScaleType={setSelectedScaleType}
                 />
+                <Separator orientation="horizontal" className="mt-4" />
                 <DrawerFooter>
                   <DrawerClose>
                     <Button variant="outline">Close</Button>

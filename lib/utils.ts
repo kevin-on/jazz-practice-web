@@ -5,6 +5,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const getRandomElement = (list: any[]) => {
+export const getRandomElement = (list: unknown[]) => {
   return list[Math.floor(Math.random() * list.length)]
 }
