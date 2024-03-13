@@ -6,20 +6,30 @@ import Link from 'next/link'
 import { ChevronLeft, Pause, Play } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import SettingsDrawer from './settings'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { GENERAL_MUSIC_KEYS, MusicKey } from '@/types/key'
-import { ChordType, EVERY_CHORDTYPES, Chord } from '@/types/chord'
+import {
+  ChordType,
+  EVERY_CHORDTYPES,
+  Chord,
+  MAJOR_DIATONIC_CHORDTYPE,
+  NATURAL_MINOR_DIATONIC_CHORDTYPE,
+} from '@/types/chord'
 import { getRandomElement } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ChordTypeAbbreviations } from '@/types/chord'
 import useLocalStorageState from '@/lib/useLocalStorageState'
 import { usePathname } from 'next/navigation'
+import { MAJOR_SCALES, NATURAL_MINOR_SCALES, ScaleType } from '@/types/scale'
 
 export default function RandomChordPracticePage() {
   const [isPlaying, setIsPlaying] = useState(false)
   const wasPlayingRef = useRef(isPlaying)
 
   const pathname = usePathname()
+  const [practiceMode, setPracticeMode] = useLocalStorageState<
+    'random' | 'diatonic'
+  >(`${pathname}:practiceMode`, 'random')
   const [tempo, setTempo] = useLocalStorageState<number>(
     `${pathname}:tempo`,
     90,
@@ -31,24 +41,76 @@ export default function RandomChordPracticePage() {
   const [selectedChordTypes, setSelectedChordTypes] = useLocalStorageState<
     ChordType[]
   >(`${pathname}:selectedChordTypes`, EVERY_CHORDTYPES)
+  const [selectedKey, setSelectedKey] = useLocalStorageState<MusicKey>(
+    `${pathname}:selectedKey`,
+    'C',
+  )
+  const [selectedScaleType, setSelectedScaleType] =
+    useLocalStorageState<ScaleType>(`${pathname}:selectedScaleType`, 'major')
 
   const [currentChord, setCurrentChord] = useState<Chord | null>(null)
   const [nextChord, setNextChord] = useState<Chord | null>(null)
   const nextChordRef = useRef(nextChord)
+
+  const getRandomChord = useCallback(
+    () => ({
+      root: getRandomElement(selectedRoots),
+      type: getRandomElement(selectedChordTypes),
+    }),
+    [selectedRoots, selectedChordTypes],
+  )
+
+  const getRandomDiatonicChord = useCallback(() => {
+    if (selectedScaleType === 'major') {
+      const scale = MAJOR_SCALES.find((s) => s.key === selectedKey)
+      const chordTypes = MAJOR_DIATONIC_CHORDTYPE
+      if (!scale) {
+        throw new Error('Scale not found')
+      }
+      if (scale.notes.length != chordTypes.length) {
+        throw new Error('Scale and chord types do not match')
+      }
+      const random_index = Math.floor(Math.random() * scale.notes.length)
+      return {
+        root: scale.notes[random_index],
+        type: chordTypes[random_index],
+      }
+    } else if (selectedScaleType === 'natural minor') {
+      const scale = NATURAL_MINOR_SCALES.find((s) => s.key === selectedKey)
+      const chordTypes = NATURAL_MINOR_DIATONIC_CHORDTYPE
+      if (!scale) {
+        throw new Error('Scale not found')
+      }
+      if (scale.notes.length != chordTypes.length) {
+        throw new Error('Scale and chord types do not match')
+      }
+      const random_index = Math.floor(Math.random() * scale.notes.length)
+      return {
+        root: scale.notes[random_index],
+        type: chordTypes[random_index],
+      }
+    } else {
+      throw new Error('Invalid scale type')
+    }
+  }, [selectedKey, selectedScaleType])
+
+  const generateChord = useCallback(() => {
+    if (practiceMode === 'random') {
+      return getRandomChord()
+    } else if (practiceMode === 'diatonic') {
+      return getRandomDiatonicChord()
+    } else {
+      throw new Error('Invalid practice mode')
+    }
+  }, [practiceMode, getRandomChord, getRandomDiatonicChord])
 
   useEffect(() => {
     nextChordRef.current = nextChord
   }, [nextChord])
 
   useEffect(() => {
-    setCurrentChord({
-      root: getRandomElement(selectedRoots),
-      type: getRandomElement(selectedChordTypes),
-    })
-    setNextChord({
-      root: getRandomElement(selectedRoots),
-      type: getRandomElement(selectedChordTypes),
-    })
+    setCurrentChord(generateChord())
+    setNextChord(generateChord)
   }, [])
 
   useEffect(() => {
@@ -56,16 +118,24 @@ export default function RandomChordPracticePage() {
       const intervalId = setInterval(
         () => {
           setCurrentChord(nextChordRef.current)
-          setNextChord({
-            root: getRandomElement(selectedRoots),
-            type: getRandomElement(selectedChordTypes),
-          })
+          let newChord = null
+          // Try to generate a new chord that is different from the current one
+          for (let i = 0; i < 3; i++) {
+            newChord = generateChord()
+            if (
+              newChord.root != nextChordRef.current?.root ||
+              newChord.type != nextChordRef.current?.type
+            ) {
+              break
+            }
+          }
+          setNextChord(newChord)
         },
         (60 / tempo) * 1000 * 4,
       )
       return () => clearInterval(intervalId)
     }
-  }, [isPlaying, tempo, selectedRoots, selectedChordTypes])
+  }, [isPlaying, tempo, generateChord])
 
   return (
     <div className="relative flex flex-col sm:py-6">
@@ -121,12 +191,18 @@ export default function RandomChordPracticePage() {
               )}
             </Button>
             <SettingsDrawer
+              practiceMode={practiceMode}
+              setPracticeMode={setPracticeMode}
               tempo={tempo}
               setTempo={setTempo}
               selectedRoots={selectedRoots}
               setSelectedRoots={setSelectedRoots}
               selectedChordTypes={selectedChordTypes}
               setSelectedChordTypes={setSelectedChordTypes}
+              selectedKey={selectedKey}
+              setSelectedKey={setSelectedKey}
+              selectedScaleType={selectedScaleType}
+              setSelectedScaleType={setSelectedScaleType}
               onOpenChange={(open) => {
                 if (open) {
                   wasPlayingRef.current = isPlaying
