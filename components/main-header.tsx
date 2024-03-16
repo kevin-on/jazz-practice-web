@@ -2,7 +2,7 @@ import Link from 'next/link'
 import MainNav from './main-nav'
 import { ModeToggle } from './mode-toggle'
 import { Music } from 'lucide-react'
-import DropdownNav from './dropdown-nav'
+import MobileNav from './mobile-nav'
 
 export default function MainHeader() {
   return (
@@ -16,7 +16,7 @@ export default function MainHeader() {
           <MainNav />
         </div>
         <div className="sm:hidden">
-          <DropdownNav />
+          <MobileNav />
         </div>
         <ModeToggle />
       </div>
