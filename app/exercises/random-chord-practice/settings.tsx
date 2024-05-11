@@ -1,5 +1,6 @@
 'use client'
 
+import { Switch } from '@/components/ui/switch'
 import {
   Drawer,
   DrawerClose,
@@ -40,6 +41,26 @@ function TempoSlider({
         max={200}
         min={30}
         step={1}
+      />
+    </div>
+  )
+}
+
+function MetronomeSwitch({
+  isMetronomeMuted,
+  setIsMetronomeMuted,
+}: {
+  isMetronomeMuted: boolean
+  setIsMetronomeMuted: (muted: boolean) => void
+}) {
+  return (
+    <div className="flex items-center justify-between">
+      <div className="font-semibold">Metronome Sound</div>
+      <Switch
+        checked={!isMetronomeMuted}
+        onCheckedChange={(check) => {
+          setIsMetronomeMuted(!check)
+        }}
       />
     </div>
   )
@@ -219,6 +240,8 @@ export default function SettingsDrawer({
   setPracticeMode,
   tempo,
   setTempo,
+  isMetronomeMuted,
+  setIsMetronomeMuted,
   selectedRoots,
   setSelectedRoots,
   selectedChordTypes,
@@ -233,6 +256,8 @@ export default function SettingsDrawer({
   setPracticeMode: (mode: 'random' | 'diatonic') => void
   tempo: number
   setTempo: (tempo: number) => void
+  isMetronomeMuted: boolean
+  setIsMetronomeMuted: (muted: boolean) => void
   selectedRoots: MusicKey[]
   setSelectedRoots: (roots: MusicKey[]) => void
   selectedChordTypes: ChordType[]
@@ -274,6 +299,11 @@ export default function SettingsDrawer({
               <TabsContent value="random">
                 <Separator orientation="horizontal" className="mb-4" />
                 <TempoSlider tempo={tempo} setTempo={setTempo} />
+                <Separator orientation="horizontal" className="my-4" />
+                <MetronomeSwitch
+                  isMetronomeMuted={isMetronomeMuted}
+                  setIsMetronomeMuted={setIsMetronomeMuted}
+                />
                 <Separator orientation="horizontal" className="my-4" />
                 <RootSelect
                   selectedRoots={selectedRoots}

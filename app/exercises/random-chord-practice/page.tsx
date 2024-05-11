@@ -1,9 +1,8 @@
 'use client'
-
 import { Button } from '@/components/ui/button'
 import { buttonVariants } from '@/components/ui/button'
 import Link from 'next/link'
-import { ChevronLeft, Pause, Play } from 'lucide-react'
+import { ChevronLeft, Circle, Pause, Play } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import SettingsDrawer from './settings'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -24,6 +23,8 @@ import { MAJOR_SCALES, NATURAL_MINOR_SCALES, ScaleType } from '@/types/scale'
 
 export default function RandomChordPracticePage() {
   const [isPlaying, setIsPlaying] = useState(false)
+  const [beat, setBeat] = useState(0)
+  const audioRefs = [0, 1, 2, 3].map(() => useRef(new Audio('/metronome.mp3')))
   const wasPlayingRef = useRef(isPlaying)
 
   const pathname = usePathname()
@@ -33,6 +34,10 @@ export default function RandomChordPracticePage() {
   const [tempo, setTempo] = useLocalStorageState<number>(
     `${pathname}:tempo`,
     90,
+  )
+  const [isMetronomeMuted, setIsMetronomeMuted] = useLocalStorageState<boolean>(
+    `${pathname}:isMetronomeMuted`,
+    false,
   )
   const [selectedRoots, setSelectedRoots] = useLocalStorageState<MusicKey[]>(
     `${pathname}:selectedRoots`,
@@ -117,25 +122,36 @@ export default function RandomChordPracticePage() {
     if (isPlaying) {
       const intervalId = setInterval(
         () => {
-          setCurrentChord(nextChordRef.current)
-          let newChord = null
-          // Try to generate a new chord that is different from the current one
-          for (let i = 0; i < 3; i++) {
-            newChord = generateChord()
-            if (
-              newChord.root != nextChordRef.current?.root ||
-              newChord.type != nextChordRef.current?.type
-            ) {
-              break
-            }
-          }
-          setNextChord(newChord)
+          setBeat((beat) => (beat + 1) % 4)
+          // TODO: Fix metronome audio. Metronome audio is not playing in the correct timing due to loading delay.
+          // if (audioRefs[beat].current && !isMetronomeMuted) {
+          //   audioRefs[beat].current.currentTime = 0
+          //   audioRefs[beat].current.play()
+          // }
         },
-        (60 / tempo) * 1000 * 4,
+        (60 / tempo) * 1000,
       )
       return () => clearInterval(intervalId)
     }
   }, [isPlaying, tempo, generateChord])
+
+  useEffect(() => {
+    if (isPlaying && beat === 0) {
+      setCurrentChord(nextChordRef.current)
+      let newChord = null
+      // Try to generate a new chord that is different from the current one
+      for (let i = 0; i < 3; i++) {
+        newChord = generateChord()
+        if (
+          newChord.root != nextChordRef.current?.root ||
+          newChord.type != nextChordRef.current?.type
+        ) {
+          break
+        }
+      }
+      setNextChord(newChord)
+    }
+  }, [isPlaying, beat, generateChord])
 
   return (
     <div className="relative flex flex-col sm:py-6">
@@ -149,27 +165,40 @@ export default function RandomChordPracticePage() {
         </Link>
       </div>
       <div className="px-4 py-2">
-        <div className="text-3xl font-bold">Random chord practice</div>
+        <div className="text-2xl font-bold">Random chord practice</div>
         <div className="flex flex-col items-center py-12">
           <div
             className="flex flex-col items-center"
             onClick={() => setIsPlaying(!isPlaying)}
           >
             {currentChord ? (
-              <div className="mb-12 text-8xl font-semibold tracking-tight">
+              <div className="mb-4 text-7xl font-semibold tracking-tight sm:mb-8 sm:text-9xl">
                 {currentChord.root + ChordTypeAbbreviations[currentChord.type]}
               </div>
             ) : (
-              <Skeleton className="mb-12 h-24 w-48" />
+              <Skeleton className="mb-4 h-24 w-48 sm:mb-8" />
             )}
-            <div className="mb-4 text-2xl">Up Next...</div>
+            <div className="mb-4 text-2xl sm:text-3xl">Up Next...</div>
             {nextChord ? (
-              <div className="mb-12 text-6xl font-semibold tracking-tight">
+              <div className="text-6xl font-semibold tracking-tight sm:mb-8 sm:text-8xl">
                 {nextChord.root + ChordTypeAbbreviations[nextChord.type]}
               </div>
             ) : (
-              <Skeleton className="mb-12 h-16 w-32" />
+              <Skeleton className="h-16 w-32" />
             )}
+          </div>
+          <div className="flex items-center justify-between gap-8 py-12 sm:mb-12 sm:gap-16">
+            {[0, 1, 2, 3].map((i) => (
+              <Circle
+                key={i}
+                className={cn(
+                  'h-12 w-12 fill-secondary-foreground sm:h-16 sm:w-16',
+                  {
+                    'fill-primary-foreground': i === beat,
+                  },
+                )}
+              />
+            ))}
           </div>
           <div className="flex items-center gap-4">
             <Button
@@ -195,6 +224,8 @@ export default function RandomChordPracticePage() {
               setPracticeMode={setPracticeMode}
               tempo={tempo}
               setTempo={setTempo}
+              isMetronomeMuted={isMetronomeMuted}
+              setIsMetronomeMuted={setIsMetronomeMuted}
               selectedRoots={selectedRoots}
               setSelectedRoots={setSelectedRoots}
               selectedChordTypes={selectedChordTypes}
