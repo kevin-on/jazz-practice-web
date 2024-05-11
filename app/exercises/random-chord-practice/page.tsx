@@ -24,7 +24,7 @@ import { MAJOR_SCALES, NATURAL_MINOR_SCALES, ScaleType } from '@/types/scale'
 export default function RandomChordPracticePage() {
   const [isPlaying, setIsPlaying] = useState(false)
   const [beat, setBeat] = useState(0)
-  const audioRefs = [0, 1, 2, 3].map(() => useRef(new Audio('/metronome.mp3')))
+  // const audioRefs = [0, 1, 2, 3].map(() => useRef(new Audio('/metronome.mp3')))
   const wasPlayingRef = useRef(isPlaying)
 
   const pathname = usePathname()
