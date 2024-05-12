@@ -20,11 +20,11 @@ import { ChordTypeAbbreviations } from '@/types/chord'
 import useLocalStorageState from '@/lib/useLocalStorageState'
 import { usePathname } from 'next/navigation'
 import { MAJOR_SCALES, NATURAL_MINOR_SCALES, ScaleType } from '@/types/scale'
+import synthClickService from './synth-click-service'
 
 export default function RandomChordPracticePage() {
   const [isPlaying, setIsPlaying] = useState(false)
   const [beat, setBeat] = useState(0)
-  // const audioRefs = [0, 1, 2, 3].map(() => useRef(new Audio('/metronome.mp3')))
   const wasPlayingRef = useRef(isPlaying)
 
   const pathname = usePathname()
@@ -123,11 +123,6 @@ export default function RandomChordPracticePage() {
       const intervalId = setInterval(
         () => {
           setBeat((beat) => (beat + 1) % 4)
-          // TODO: Fix metronome audio. Metronome audio is not playing in the correct timing due to loading delay.
-          // if (audioRefs[beat].current && !isMetronomeMuted) {
-          //   audioRefs[beat].current.currentTime = 0
-          //   audioRefs[beat].current.play()
-          // }
         },
         (60 / tempo) * 1000,
       )
@@ -136,7 +131,13 @@ export default function RandomChordPracticePage() {
   }, [isPlaying, tempo, generateChord])
 
   useEffect(() => {
-    if (isPlaying && beat === 0) {
+    if (!isPlaying) {
+      return
+    }
+    if (!isMetronomeMuted) {
+      synthClickService.play()
+    }
+    if (beat === 0) {
       setCurrentChord(nextChordRef.current)
       let newChord = null
       // Try to generate a new chord that is different from the current one
@@ -151,7 +152,7 @@ export default function RandomChordPracticePage() {
       }
       setNextChord(newChord)
     }
-  }, [isPlaying, beat, generateChord])
+  }, [isPlaying, beat, generateChord, isMetronomeMuted])
 
   return (
     <div className="relative flex flex-col sm:py-6">
