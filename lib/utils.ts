@@ -6,5 +6,8 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const getRandomElement = <T>(list: T[]): T => {
+  if (list.length === 0) {
+    throw new Error('Cannot get random element from empty array')
+  }
   return list[Math.floor(Math.random() * list.length)]
 }
