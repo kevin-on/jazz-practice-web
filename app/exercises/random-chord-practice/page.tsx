@@ -115,7 +115,7 @@ export default function RandomChordPracticePage() {
 
   useEffect(() => {
     setCurrentChord(generateChord())
-    setNextChord(generateChord)
+    setNextChord(generateChord())
   }, [])
 
   useEffect(() => {
@@ -144,8 +144,8 @@ export default function RandomChordPracticePage() {
       for (let i = 0; i < 3; i++) {
         newChord = generateChord()
         if (
-          newChord.root != nextChordRef.current?.root ||
-          newChord.type != nextChordRef.current?.type
+          newChord.root !== nextChordRef.current?.root ||
+          newChord.type !== nextChordRef.current?.type
         ) {
           break
         }
