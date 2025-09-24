@@ -22,7 +22,7 @@ export function useMetronome(
   useEffect(() => {
     setCurrentChord(generateChord())
     setNextChord(generateChord())
-  }, [])
+  }, [generateChord])
 
   useEffect(() => {
     if (isPlaying) {

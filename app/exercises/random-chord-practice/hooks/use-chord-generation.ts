@@ -51,10 +51,10 @@ export function useChordGeneration(
       throw new Error('Scale and chord types do not match')
     }
 
-    const random_index = Math.floor(Math.random() * scale.notes.length)
+    const randomIndex = Math.floor(Math.random() * scale.notes.length)
     return {
-      root: scale.notes[random_index],
-      type: chordTypes[random_index],
+      root: scale.notes[randomIndex],
+      type: chordTypes[randomIndex],
     }
   }, [scaleInfo])
 
