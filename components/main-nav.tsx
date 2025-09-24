@@ -12,21 +12,7 @@ import {
   NavigationMenuList,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu'
-
-export const menuItems = [
-  {
-    title: 'Exercises',
-    href: '/exercises',
-  },
-  {
-    title: 'About',
-    href: '/about',
-  },
-  {
-    title: 'Contact',
-    href: '/contact',
-  },
-]
+import { menuItems } from '@/config/navigation'
 
 export default function MainNav() {
   const pathname = usePathname()

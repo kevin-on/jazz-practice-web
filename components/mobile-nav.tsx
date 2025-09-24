@@ -1,7 +1,7 @@
 'use client'
 
 import { Menu, Music } from 'lucide-react'
-import { menuItems } from './main-nav'
+import { menuItems } from '@/config/navigation'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import Link from 'next/link'
 import { useState } from 'react'
