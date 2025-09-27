@@ -74,3 +74,6 @@ The application revolves around jazz music practice with these core types:
 ### Git Commit Guidelines
 
 - **Commit Messages**: Never include references to "Claude Code" or AI assistance in commit messages. Keep commits professional and focused on the technical changes made.
+- **File Exclusions**: Do not commit temporary or planning files such as:
+  - Personal notes or scratch files
+  - Any files with temporary or planning purposes that are not part of the application codebase
